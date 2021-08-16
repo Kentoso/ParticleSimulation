@@ -71,82 +71,6 @@ void end() {
 	SDL_Quit();
 }
 
-void render(std::vector<particle*> particles, SDL_Renderer* renderer) {
-	SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
-	SDL_RenderClear(renderer);
-	for (auto p : particles)
-	{
-		SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
-		SDL_RenderDrawPoint(renderer, p->x, p->y);
-		if (!(p->y + 1>= SCREEN_HEIGHT))
-		{
-			++p->y;
-		}
-	}
-}
-
-void render(std::vector<std::vector<uint16_t>> &particles, SDL_Renderer* renderer) {
-	SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
-	SDL_RenderClear(renderer);
-	std::vector<std::pair<int, int>> ignoreParticles;
-	for (int i = 0; i < particles.size(); i++)
-	{
-		for (int j = 0; j < particles[0].size(); j++)
-		{
-			int x = i;
-			int y = particles[0].size() - 1 - j;
-			if (particles[x][y] == SAND)
-			{
-				SDL_SetRenderDrawColor(renderer, 255, 255, 0, 255);
-				if (int64_t(y) + 1 < particles[0].size()) {
-					if (particles[x][int64_t(y) + 1] == EMPTY)
-					{
-						SDL_RenderDrawPoint(renderer, x, y + 1);
-						particles[x][y] = EMPTY;
-						particles[x][int64_t(y) + 1] = SAND;
-					}
-					else if (x - 1 > 0) {
-						if (particles[x - 1][int64_t(y) + 1] == EMPTY)
-						{
-							SDL_RenderDrawPoint(renderer, x - 1, y + 1);
-							particles[x][y] = EMPTY;
-							particles[x - 1][int64_t(y) + 1] = SAND;
-						}
-					}
-					else if (x + 1 < SCREEN_WIDTH) {
-						if (particles[x + 1][int64_t(y) + 1] == EMPTY)
-						{
-							SDL_RenderDrawPoint(renderer, x - 1, y + 1);
-							particles[x][y] = EMPTY;
-							particles[x + 1][int64_t(y) + 1] = SAND;
-						}
-					}
-					else
-					{
-						SDL_RenderDrawPoint(renderer, x, y);
-					}
-				}
-				else
-				{
-					SDL_RenderDrawPoint(renderer, x, y);
-				}
-			}
-		}
-	}
-	SDL_RenderPresent(renderer);
-}
-
-bool isIgnored(std::vector<std::pair<int, int>> ignorePos, int x, int y) {
-	for (auto pos : ignorePos)
-	{
-		if (x == pos.first && y == pos.second)
-		{
-			return true;
-		}
-	}
-	return false;
-}
-
 void draw(std::vector<std::vector<uint16_t>>& particles, SDL_Renderer* renderer) {
 	SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
 	SDL_RenderClear(renderer);
@@ -159,14 +83,16 @@ void draw(std::vector<std::vector<uint16_t>>& particles, SDL_Renderer* renderer)
 				SDL_SetRenderDrawColor(renderer, 255, 255, 0, 255);
 				SDL_RenderDrawPoint(renderer, x, y);
 			}
+			else if (particles[x][y] == BEDROCK) {
+				SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+				SDL_RenderDrawPoint(renderer, x, y);
+			}
 		}
 	}
 }
 
-bool update(std::vector<std::vector<uint16_t>>& particles, SDL_Renderer* renderer) {
+bool update(std::vector<std::vector<uint16_t>>& particles) {
 	int updated = 0;
-	SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
-	SDL_RenderClear(renderer);
 	std::vector<std::vector<uint16_t>> p = particles;
 	for (size_t x = 0; x < SCREEN_WIDTH; x++)
 	{
@@ -174,37 +100,24 @@ bool update(std::vector<std::vector<uint16_t>>& particles, SDL_Renderer* rendere
 		{
 			if (p[x][y] == SAND)
 			{
-				SDL_SetRenderDrawColor(renderer, 255, 255, 0, 255);
 				if (p[x][y + 1] == EMPTY)
 				{
-					SDL_RenderDrawPoint(renderer, x, y + 1);
 					particles[x][y] = EMPTY;
 					particles[x][y + 1] = SAND;
 					updated++;
 				}
 				else if (p[x - 1][y + 1] == EMPTY)
 				{
-					SDL_RenderDrawPoint(renderer, x - 1, y + 1);
 					particles[x][y] = EMPTY;
 					particles[x - 1][y + 1] = SAND;
 					updated++;
 				}
 				else if (p[x + 1][y + 1] == EMPTY)
 				{
-					SDL_RenderDrawPoint(renderer, x + 1, y + 1);
 					particles[x][y] = EMPTY;
 					particles[x + 1][y + 1] = SAND;
 					updated++;
 				}
-				else
-				{
-					SDL_RenderDrawPoint(renderer, x, y);
-				}
-
-			}
-			else if (p[x][y] == BEDROCK) {
-				SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
-				SDL_RenderDrawPoint(renderer, x, y);
 			}
 		}
 	}
@@ -213,8 +126,8 @@ bool update(std::vector<std::vector<uint16_t>>& particles, SDL_Renderer* rendere
 
 int main(int argc, char* args[])
 {
-	bool playing = true;
-
+	bool playing = true, updating = true, lClickHeld = false;
+	SDL_Point mouseCoord;
 	std::vector<std::vector<uint16_t>> p;
 
 	p.resize(SCREEN_WIDTH);
@@ -222,18 +135,6 @@ int main(int argc, char* args[])
 	{
 		p[i].resize(SCREEN_HEIGHT, EMPTY);
 	}
-	//for (size_t i = 0; i < 100; i++)
-	//{	
-	//	p[400][i] = SAND;
-	//}
-	//for (int j = 0; j < p.size(); j++)
-	//{
-	//	for (int i = 0; i < p[0].size(); i++)
-	//	{
-	//		//p[i][p[0].size() - 1 - i] = SAND;
-	//		p[j][i] = SAND;
-	//	}
-	//}
 
 	for (size_t i = 0; i < SCREEN_WIDTH; i++)
 	{
@@ -247,9 +148,13 @@ int main(int argc, char* args[])
 	}
 
 
-
-
-
+	for (size_t i = 1; i < SCREEN_WIDTH - 1; i++)
+	{
+		for (size_t j = 1; j < SCREEN_HEIGHT / 2 - 1; j++)
+		{
+			p[i][j] = SAND;
+		}
+	}
 
 	if (initializationAndLoading())
 	{
@@ -262,19 +167,49 @@ int main(int argc, char* args[])
 				{
 					playing = false;
 				}
+				if (e.type == SDL_KEYDOWN && e.key.keysym.sym == SDLK_SPACE)
+				{
+					updating = updating ? false : true;
+				}
+				if (e.type == SDL_MOUSEMOTION)
+				{
+					mouseCoord.x = e.motion.x;
+					mouseCoord.y = e.motion.y;
+					
+				}
+				if (e.type == SDL_MOUSEBUTTONDOWN && e.button.button == SDL_BUTTON_LEFT)
+				{
+					lClickHeld = true;
+				}
+				if (e.type == SDL_MOUSEBUTTONUP && e.button.button == SDL_BUTTON_LEFT)
+				{
+					lClickHeld = false;
+				}
 			}
-			update(p, renderer);
-			SDL_RenderPresent(renderer);
+			if (lClickHeld)
+			{
+				if (p[mouseCoord.x][mouseCoord.y] != BEDROCK)
+				{
+					p[mouseCoord.x][mouseCoord.y] = SAND;
+					printf("%d, %d\n", mouseCoord.x, mouseCoord.y);
+					if (!updating)
+					{
+						draw(p, renderer);
+						SDL_RenderPresent(renderer);
+					}
+				}
+			}
+			if (updating)
+			{
+				if (update(p))
+				{
+					draw(p, renderer);
+					SDL_RenderPresent(renderer);
+				}
+			}
+			
 			SDL_UpdateWindowSurface(window);
 			SDL_Delay(10);
-		
-			if (i++ % 10 == 0)
-			{
-				/*p[500][500] = SAND;
-				p[501][500] = SAND;
-				p[501][501] = SAND;
-				p[500][501] = SAND;*/
-			}	
 		}
 	}
 
