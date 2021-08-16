@@ -1,2 +1,3 @@
 ﻿  main.cpp
+E:\Projects\Visual Studio\SDL2First\SDL2First\main.cpp(108,24): warning C4018: '<': signed/unsigned mismatch
   SDL2First.vcxproj -> E:\Projects\Visual Studio\SDL2First\x64\Debug\SDL2First.exe

@@ -1,6 +1,8 @@
 #include <SDL.h>
 #include <iostream>
 #include <vector>
+#include <utility>
+
 #include "particle.h"
 
 const int SCREEN_WIDTH = 800;
@@ -43,13 +45,6 @@ bool load() {
 	return true;
 }
 
-void end() {
-	SDL_DestroyWindow(window);
-	window = NULL;
-	SDL_DestroyRenderer(renderer);
-
-	SDL_Quit();
-}
 bool initializationAndLoading() {
 	if (!init())
 	{
@@ -66,6 +61,15 @@ bool initializationAndLoading() {
 	}
 	return true;
 }
+
+void end() {
+	SDL_DestroyWindow(window);
+	window = NULL;
+	SDL_DestroyRenderer(renderer);
+
+	SDL_Quit();
+}
+
 void render(std::vector<particle*> particles, SDL_Renderer* renderer) {
 	SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
 	SDL_RenderClear(renderer);
@@ -79,17 +83,84 @@ void render(std::vector<particle*> particles, SDL_Renderer* renderer) {
 		}
 	}
 }
+
+bool isParticleIgnored(std::vector<std::pair<int, int>> ignoreParticles, int x, int y) {
+	for (auto p : ignoreParticles)
+	{
+		if (p.first == x || p.second == y)
+		{
+			return true;
+		}
+	}
+	return false;
+}
+void render(std::vector<std::vector<uint8_t>> &particles, SDL_Renderer* renderer) {
+	SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+	SDL_RenderClear(renderer);
+	std::vector<std::pair<int, int>> ignoreParticles;
+	for (int i = 0; i < particles.size(); i++)
+	{
+		for (int j = 0; j < particles[0].size(); j++)
+		{
+			if (particles[i][j] == SAND && !isParticleIgnored(ignoreParticles, i, j))
+			{
+				SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+				if (int64_t(j) + 1 < particles[0].size()) {
+					if (particles[i][int64_t(j) + 1] == SAND) 
+					{
+						SDL_RenderDrawPoint(renderer, i, j);
+					}
+					else
+					{
+						SDL_RenderDrawPoint(renderer, i, j + 1);
+						particles[i][j] = EMPTY;
+						particles[i][int64_t(j) + 1] = SAND;
+						ignoreParticles.push_back(std::make_pair(int(i), int(j + 1)));
+					}
+				}
+				else
+				{
+					SDL_RenderDrawPoint(renderer, i, j);
+				}
+			}
+		}
+	}
+	SDL_RenderPresent(renderer);
+}
 int main(int argc, char* args[])
 {
 	bool playing = true;
 
-	std::vector<particle*> particles;
+	//std::vector<particle*> particles;
+	//for (int i = 0; i < SCREEN_WIDTH; i++)
+	//{
+	//	for (int j = 200; j < 400; j++)
+	//	{
+	//		particles.push_back(new particle(i, j));
+	//	}
+	//}
+
+	std::vector<std::vector<uint8_t>> p;
+	//for (int i = 0; i < SCREEN_WIDTH; i++)
+	//{
+	//	std::vector<uint8_t> vecX;
+	//	p.push_back(vecX);
+	//	for (int j = 0; j < SCREEN_HEIGHT; j++)
+	//	{
+	//		p[i].push_back(EMPTY);
+	//	}
+	//}
+	p.resize(SCREEN_WIDTH);
 	for (int i = 0; i < SCREEN_WIDTH; i++)
 	{
-		for (int j = 200; j < 400; j++)
-		{
-			particles.push_back(new particle(i, j));
-		}
+		p[i].resize(SCREEN_HEIGHT, EMPTY);
+	}
+
+	for (int i = 0; i < p[0].size(); i++)
+	{
+		p[i][0] = SAND;
+		p[i][1] = SAND;
+
 	}
 	if (initializationAndLoading())
 	{
@@ -102,16 +173,16 @@ int main(int argc, char* args[])
 					playing = false;
 				}
 			}
-			render(particles, renderer);
-			SDL_RenderPresent(renderer);
+			render(p, renderer);
+
 			SDL_UpdateWindowSurface(window);
-			SDL_Delay(17);
+			SDL_Delay(10);
 		}
 	}
-	for (auto particle : particles)
-	{
-		delete particle;
-	}
+	//for (auto particle : particles)
+	//{
+	//	delete particle;
+	//}
 	end();
 
 	return 0;
