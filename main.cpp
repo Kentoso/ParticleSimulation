@@ -2,22 +2,23 @@
 #include <iostream>
 #include <vector>
 #include <utility>
-
-#include "particle.h"
+#include <cmath>
+#include "physics_behaviour.h"
 
 const int SCREEN_WIDTH = 800;
 const int SCREEN_HEIGHT = 600;
+int lastWater = 0;
 
 SDL_Window* window;
 SDL_Surface* gScreenSurface;
 SDL_Renderer* renderer;
 SDL_Event e;
 
-enum Tiles {
-	EMPTY, 
-	SAND,
-	BEDROCK
-};
+//enum Tiles {
+//	EMPTY, 
+//	SAND,
+//	BEDROCK
+//};
 
 bool init() {
 	if (SDL_Init(SDL_INIT_VIDEO) < 0)
@@ -37,6 +38,7 @@ bool init() {
 		{
 			renderer = SDL_CreateRenderer(window, -1,
 				SDL_RENDERER_SOFTWARE);
+			SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "1");
 		}
 	}
 	return true;
@@ -87,12 +89,21 @@ void draw(std::vector<std::vector<uint16_t>>& particles, SDL_Renderer* renderer)
 				SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
 				SDL_RenderDrawPoint(renderer, x, y);
 			}
+			else if (particles[x][y] == WATER) {
+				SDL_SetRenderDrawColor(renderer, 0, 0, 255, 255);
+				SDL_RenderDrawPoint(renderer, x, y);
+			}
+			else if (particles[x][y] == STONE) {
+				SDL_SetRenderDrawColor(renderer, 100, 100, 100, 255);
+				SDL_RenderDrawPoint(renderer, x, y);
+			}
 		}
 	}
 }
 
 bool update(std::vector<std::vector<uint16_t>>& particles) {
 	int updated = 0;
+	int water = 0;
 	std::vector<std::vector<uint16_t>> p = particles;
 	for (size_t x = 0; x < SCREEN_WIDTH; x++)
 	{
@@ -102,32 +113,77 @@ bool update(std::vector<std::vector<uint16_t>>& particles) {
 			{
 				if (p[x][y + 1] == EMPTY)
 				{
-					particles[x][y] = EMPTY;
+					auto tile = particles[x][y + 1];
+					particles[x][y] = tile;
 					particles[x][y + 1] = SAND;
 					updated++;
 				}
-				else if (p[x - 1][y + 1] == EMPTY)
+				else if (p[x - 1][y + 1] == EMPTY && std::rand() % 2 == 0)
 				{
-					particles[x][y] = EMPTY;
+					auto tile = particles[x - 1][y + 1];
+					particles[x][y] = tile;
 					particles[x - 1][y + 1] = SAND;
 					updated++;
 				}
-				else if (p[x + 1][y + 1] == EMPTY)
+				else if (p[x + 1][y + 1] == EMPTY && std::rand() % 2 == 1)
 				{
-					particles[x][y] = EMPTY;
+					auto tile = particles[x + 1][y + 1];
+					particles[x][y] = tile;
 					particles[x + 1][y + 1] = SAND;
+					updated++;
+				}
+
+			}
+			else if (p[x][y] == WATER)
+			{
+				water++;
+				if (p[x][y + 1] == EMPTY)
+				{
+					auto tile = particles[x][y + 1];
+					particles[x][y] = tile;
+					particles[x][y + 1] = WATER;
+					updated++;
+				}
+				else if (p[x - 1][y + 1] == EMPTY && std::rand() % 2 == 0)
+				{
+					auto tile = particles[x - 1][y + 1];
+					particles[x][y] = tile;
+					particles[x - 1][y + 1] = WATER;
+					updated++;
+				}
+				else if (p[x + 1][y + 1] == EMPTY && std::rand() % 2 == 1)
+				{
+					auto tile = particles[x + 1][y + 1];
+					particles[x][y] = tile;
+					particles[x + 1][y + 1] = WATER;
+					updated++;
+				}
+				else if (particles[x + 1][y] == EMPTY && std::rand() % 2 == 0) {
+					auto tile = particles[x + 1][y];
+					particles[x][y] = tile;
+					particles[x + 1][y] = WATER;
+					updated++;
+				}
+				else if (particles[x - 1][y] == EMPTY && std::rand() % 2 == 1) {
+					auto tile = particles[x - 1][y];
+					particles[x][y] = tile;
+					particles[x - 1][y] = WATER;
 					updated++;
 				}
 			}
 		}
 	}
+	lastWater = water;
+	printf("WATER: %d\n", water);
 	return updated;
 }
 
 int main(int argc, char* args[])
 {
-	bool playing = true, updating = true, lClickHeld = false;
+	bool playing = true, updating = true, lClickHeld = false, rClickHeld = false;
+	Tiles currentElement = SAND;
 	SDL_Point mouseCoord;
+	int brushSize = 1;
 	std::vector<std::vector<uint16_t>> p;
 
 	p.resize(SCREEN_WIDTH);
@@ -148,16 +204,27 @@ int main(int argc, char* args[])
 	}
 
 
-	for (size_t i = 1; i < SCREEN_WIDTH - 1; i++)
+	//for (size_t i = 1; i < SCREEN_WIDTH - 1; i++)
+	//{
+	//	for (size_t j = 1; j < SCREEN_HEIGHT / 2 - 1; j++)
+	//	{
+	//		p[i][j] = SAND;
+	//	}
+	//}
+
+	for (size_t i = 400; i < 500; i++)
 	{
-		for (size_t j = 1; j < SCREEN_HEIGHT / 2 - 1; j++)
-		{
-			p[i][j] = SAND;
-		}
+		p[1][i] = WATER;
+	}
+
+	for (size_t i = 400; i < 500; i++)
+	{
+		p[i][400] = STONE;
 	}
 
 	if (initializationAndLoading())
 	{
+
 		int i = 0;
 		while (playing)
 		{
@@ -167,9 +234,23 @@ int main(int argc, char* args[])
 				{
 					playing = false;
 				}
-				if (e.type == SDL_KEYDOWN && e.key.keysym.sym == SDLK_SPACE)
+				if (e.type == SDL_KEYDOWN)
 				{
-					updating = updating ? false : true;
+					switch (e.key.keysym.sym)
+					{
+					case (SDLK_SPACE):
+						updating = updating ? false : true;
+						break;
+					case (SDLK_1):
+						currentElement = SAND;
+						break;
+					case (SDLK_2):
+						currentElement = WATER;
+						break;
+					case (SDLK_3):
+						currentElement = STONE;
+						break;
+					}
 				}
 				if (e.type == SDL_MOUSEMOTION)
 				{
@@ -185,13 +266,54 @@ int main(int argc, char* args[])
 				{
 					lClickHeld = false;
 				}
+				if (e.type == SDL_MOUSEBUTTONDOWN && e.button.button == SDL_BUTTON_RIGHT)
+				{
+					rClickHeld = true;
+				}
+				if (e.type == SDL_MOUSEBUTTONUP && e.button.button == SDL_BUTTON_RIGHT)
+				{
+					rClickHeld = false;
+				}
+				if (e.type == SDL_MOUSEWHEEL)
+				{	
+					if (e.wheel.y > 0)
+					{
+						brushSize++;
+					}
+					else if (e.wheel.y < 0)
+					{
+						if (brushSize > 1) brushSize--;
+					}
+					//std::cout << "BRUSH: " << brushSize << "\r" << std::flush;
+				}
 			}
 			if (lClickHeld)
 			{
 				if (p[mouseCoord.x][mouseCoord.y] != BEDROCK)
 				{
-					p[mouseCoord.x][mouseCoord.y] = SAND;
-					printf("%d, %d\n", mouseCoord.x, mouseCoord.y);
+					if (brushSize == 1)
+					{
+						p[mouseCoord.x][mouseCoord.y] = currentElement;
+					}
+					else
+					{
+						for (size_t i = 0; i < brushSize * 2; i++)
+						{
+							for (size_t j = 0; j < brushSize * 2; j++)
+							{
+								long distanceX = std::abs(brushSize - long(i));
+								long distanceY = std::abs(brushSize - long(j));
+								if (distanceX * distanceX + distanceY * distanceY <= brushSize * brushSize 
+									&& mouseCoord.x + i - brushSize > 0 
+									&& mouseCoord.x + i - brushSize < SCREEN_WIDTH - 1
+									&& mouseCoord.y + j - brushSize > 0
+									&& mouseCoord.y + j - brushSize < SCREEN_HEIGHT - 1)
+								{
+									p[mouseCoord.x + i - brushSize][mouseCoord.y + j - brushSize] = currentElement;
+								}
+							}
+						}
+					}
 					if (!updating)
 					{
 						draw(p, renderer);
@@ -199,6 +321,41 @@ int main(int argc, char* args[])
 					}
 				}
 			}
+			if (rClickHeld) 
+			{
+				if (p[mouseCoord.x][mouseCoord.y] != BEDROCK)
+				{
+					if (brushSize == 1)
+					{
+						p[mouseCoord.x][mouseCoord.y] = EMPTY;
+					}
+					else
+					{
+						for (size_t i = 0; i < brushSize * 2; i++)
+						{
+							for (size_t j = 0; j < brushSize * 2; j++)
+							{
+								long distanceX = std::abs(brushSize - long(i));
+								long distanceY = std::abs(brushSize - long(j));
+								if (distanceX * distanceX + distanceY * distanceY <= brushSize * brushSize
+									&& mouseCoord.x + i - brushSize > 0
+									&& mouseCoord.x + i - brushSize < SCREEN_WIDTH - 1
+									&& mouseCoord.y + j - brushSize > 0
+									&& mouseCoord.y + j - brushSize < SCREEN_HEIGHT - 1)
+								{
+									p[mouseCoord.x + i - brushSize][mouseCoord.y + j - brushSize] = EMPTY;
+								}
+							}
+						}
+					}
+					if (!updating)
+					{
+						draw(p, renderer);
+						SDL_RenderPresent(renderer);
+					}
+				}
+			}
+			//printf("%d\n", p[mouseCoord.x][mouseCoord.y]);
 			if (updating)
 			{
 				if (update(p))

@@ -1,7 +1,6 @@
 ﻿  main.cpp
-E:\Projects\Visual Studio\SDL2First\SDL2First\main.cpp(96,13): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
-E:\Projects\Visual Studio\SDL2First\SDL2First\main.cpp(97,39): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
-E:\Projects\Visual Studio\SDL2First\SDL2First\main.cpp(101,24): warning C4018: '<': signed/unsigned mismatch
-E:\Projects\Visual Studio\SDL2First\SDL2First\main.cpp(150,39): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
-E:\Projects\Visual Studio\SDL2First\SDL2First\main.cpp(154,39): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
+E:\Projects\Visual Studio\SDL2First\SDL2First\main.cpp(86,39): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
+E:\Projects\Visual Studio\SDL2First\SDL2First\main.cpp(90,39): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
+E:\Projects\Visual Studio\SDL2First\SDL2First\main.cpp(94,39): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
+E:\Projects\Visual Studio\SDL2First\SDL2First\main.cpp(98,39): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
   SDL2First.vcxproj -> E:\Projects\Visual Studio\SDL2First\x64\Debug\SDL2First.exe
