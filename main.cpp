@@ -132,9 +132,8 @@ bool update(std::vector<std::vector<uint16_t>>& particles) {
 					particles[x + 1][y + 1] = SAND;
 					updated++;
 				}
-
 			}
-			else if (p[x][y] == WATER)
+			if (p[x][y] == WATER)
 			{
 				water++;
 				if (p[x][y + 1] == EMPTY)
@@ -158,19 +157,49 @@ bool update(std::vector<std::vector<uint16_t>>& particles) {
 					particles[x + 1][y + 1] = WATER;
 					updated++;
 				}
-				else if (particles[x + 1][y] == EMPTY && std::rand() % 2 == 0) {
-					auto tile = particles[x + 1][y];
+				else if (particles[x + 1][y] == EMPTY && std::rand() % 2 == 0 || particles[x][y - 1] == WATER && std::rand() % 2 == 0) {
+					int n = 1;
+					int max = 1;
+					for (size_t i = 1; i <= 20; i++)
+					{
+						n = i;
+						if (particles[x + n][y] != EMPTY)
+						{
+							max = n - 1;
+							break;
+						}
+					}
+					auto tile = particles[x + max][y];
 					particles[x][y] = tile;
-					particles[x + 1][y] = WATER;
+					particles[x + max][y] = WATER;
 					updated++;
 				}
-				else if (particles[x - 1][y] == EMPTY && std::rand() % 2 == 1) {
-					auto tile = particles[x - 1][y];
+				else if (particles[x - 1][y] == EMPTY && std::rand() % 2 == 1 || particles[x][y - 1] == WATER && std::rand() % 2 == 1) {
+					int n = 1;
+					int max = 1;
+					for (size_t i = 1; i <= 20; i++)
+					{
+						n = i;
+						if (particles[x - n][y] != EMPTY)
+						{
+							max = n - 1;
+							break;
+						}
+					}
+					auto tile = particles[x - max][y];
 					particles[x][y] = tile;
-					particles[x - 1][y] = WATER;
+					particles[x - max][y] = WATER;
+					updated++;
+				}
+				else if (p[x][y - 1] == SAND)
+				{
+					auto tile = particles[x][y - 1];
+					particles[x][y] = tile;
+					particles[x][y - 1] = WATER;
 					updated++;
 				}
 			}
+			
 		}
 	}
 	lastWater = water;

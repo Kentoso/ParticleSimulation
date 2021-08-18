@@ -3,4 +3,6 @@ E:\Projects\Visual Studio\SDL2First\SDL2First\main.cpp(86,39): warning C4267: 'a
 E:\Projects\Visual Studio\SDL2First\SDL2First\main.cpp(90,39): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
 E:\Projects\Visual Studio\SDL2First\SDL2First\main.cpp(94,39): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
 E:\Projects\Visual Studio\SDL2First\SDL2First\main.cpp(98,39): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
+E:\Projects\Visual Studio\SDL2First\SDL2First\main.cpp(166,12): warning C4267: '=': conversion from 'size_t' to 'int', possible loss of data
+E:\Projects\Visual Studio\SDL2First\SDL2First\main.cpp(183,12): warning C4267: '=': conversion from 'size_t' to 'int', possible loss of data
   SDL2First.vcxproj -> E:\Projects\Visual Studio\SDL2First\x64\Debug\SDL2First.exe
