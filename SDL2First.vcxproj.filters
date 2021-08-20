@@ -18,21 +18,27 @@
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="particle.cpp">
+    <ClCompile Include="physics_behaviour.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="physics_behaviour.cpp">
+    <ClCompile Include="map_helper.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="event_handler.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="particle.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="physics_behaviour.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="game.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="map_helper.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="event_handler.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

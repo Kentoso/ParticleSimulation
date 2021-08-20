@@ -145,13 +145,15 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="event_handler.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="particle.cpp" />
+    <ClCompile Include="map_helper.cpp" />
     <ClCompile Include="physics_behaviour.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="event_handler.h" />
     <ClInclude Include="game.h" />
-    <ClInclude Include="particle.h" />
+    <ClInclude Include="map_helper.h" />
     <ClInclude Include="physics_behaviour.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
