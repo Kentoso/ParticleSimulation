@@ -34,7 +34,7 @@ bool init() {
 		{
 			renderer = SDL_CreateRenderer(window, -1,
 				SDL_RENDERER_SOFTWARE);
-			SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "1");
+			SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "2");
 		}
 	}
 	return true;
@@ -108,31 +108,59 @@ void draw(std::vector<std::vector<uint16_t>>& particles, SDL_Renderer* renderer)
 	}
 }
 
-bool update(std::vector<std::vector<uint16_t>>& particles) {
+bool update(std::vector<std::vector<uint16_t>>& particles, bool inverse) {
 	int updated = 0;
 	int water = 0;
 	std::vector<std::vector<uint16_t>> p = particles;
-	for (size_t x = 0; x < SCREEN_WIDTH; x++)
+	if (!inverse)
 	{
-		for (size_t y = 0; y < SCREEN_HEIGHT; y++)
+		for (size_t x = 0; x < SCREEN_WIDTH; x++)
 		{
-			if (p[x][y] == SAND)
+			for (size_t y = 0; y < SCREEN_HEIGHT; y++)
 			{
-				updated += dust::update(particles, p, x, y, SAND);
-			}
-			else if (p[x][y] == WATER)
-			{
-				water++;
-				updated += liquid::update(particles, p, x, y, WATER);
-			}
-			else if (p[x][y] == ACID) {
-				updated += acid::update(particles, p, x, y, ACID);
-			}
-			else if (p[x][y] == PLANT) {
-				updated += plant::update(particles, p, x, y, ACID);
+				if (p[x][y] == SAND)
+				{
+					updated += dust::update(particles, p, x, y, SAND);
+				}
+				else if (p[x][y] == WATER)
+				{
+					water++;
+					updated += liquid::update(particles, p, x, y, WATER);
+				}
+				else if (p[x][y] == ACID) {
+					updated += acid::update(particles, p, x, y, ACID);
+				}
+				else if (p[x][y] == PLANT) {
+					updated += plant::update(particles, p, x, y, ACID);
+				}
 			}
 		}
 	}
+	else
+	{
+		for (int x = SCREEN_WIDTH - 1; x >= 0; x--)
+		{
+			for (int y = SCREEN_HEIGHT - 1; y >= 0; y--)
+			{
+				if (p[x][y] == SAND)
+				{
+					updated += dust::update(particles, p, x, y, SAND);
+				}
+				else if (p[x][y] == WATER)
+				{
+					water++;
+					updated += liquid::update(particles, p, x, y, WATER);
+				}
+				else if (p[x][y] == ACID) {
+					updated += acid::update(particles, p, x, y, ACID);
+				}
+				else if (p[x][y] == PLANT) {
+					updated += plant::update(particles, p, x, y, ACID);
+				}
+			}
+		}
+	}
+	
 	lastWater = water;
 	return updated;
 }
@@ -146,14 +174,14 @@ void end() {
 
 int main(int argc, char* args[])
 {
-	bool playing = true, updating = true;
+	bool playing = true, updating = true, wasUpdated = false, inverse = false;
 
 	bool mouseButtonsActive[] = { false, false, false };
 	SDL_Point mouseCoord;
 
 	Tiles currentMaterial = SAND;
 	int brushSize = 1;
-
+	int frame = 1;
 	std::vector<std::vector<uint16_t>> p;
 	initParticleGrid(p);
 
@@ -194,7 +222,7 @@ int main(int argc, char* args[])
 			if (mouseButtonsActive[0])
 			{
 				map_helper::useBrush(p, mouseCoord, brushSize, currentMaterial, SCREEN_WIDTH, SCREEN_HEIGHT);
-				if (!updating)
+				if (!updating || !wasUpdated)
 				{
 					draw(p, renderer);
 					SDL_RenderPresent(renderer);
@@ -203,7 +231,7 @@ int main(int argc, char* args[])
 			if (mouseButtonsActive[2]) 
 			{
 				map_helper::useBrush(p, mouseCoord, brushSize, EMPTY, SCREEN_WIDTH, SCREEN_HEIGHT);
-				if (!updating)
+				if (!updating || !wasUpdated)
 				{
 					draw(p, renderer);
 					SDL_RenderPresent(renderer);
@@ -213,16 +241,28 @@ int main(int argc, char* args[])
 
 			if (updating)
 			{
-				if (update(p))
+				if (update(p, inverse))
 				{
-					draw(p, renderer);
+					wasUpdated = true;
+					inverse = inverse ? false : true;
+
 					SDL_RenderPresent(renderer);
+					if (frame)
+					{
+						draw(p, renderer);
+					}
+				}	
+				else
+				{
+					wasUpdated = false;
 				}
 			}
-		
+			frame = frame == 0 ? 1 : 0;
 			SDL_UpdateWindowSurface(window);
-			SDL_Delay(10);
-			//SDL_Delay((SDL_GetTicks() - preFrameTime) > 10 ? (SDL_GetTicks() - preFrameTime) : 10);
+			//SDL_Delay(10);
+			auto delay = (SDL_GetTicks() - preFrameTime) > 10 ? (SDL_GetTicks() - preFrameTime) : 10;
+			printf("%d\n", delay);
+			SDL_Delay(delay);
 		}
 	}
 

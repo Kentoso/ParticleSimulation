@@ -44,10 +44,11 @@ Tiles event_handler::chooseMaterial(SDL_Event& event) {
 void event_handler::changeBrushSize(SDL_Event& event, int& brushSize) {
 	if (event.wheel.y > 0)
 	{
-		brushSize++;
+		brushSize += 5;
 	}
 	else if (event.wheel.y < 0)
 	{
-		if (brushSize > 1) brushSize--;
+		if (brushSize - 5 > 1) brushSize -= 5;
+		else brushSize = 1;
 	}
 }

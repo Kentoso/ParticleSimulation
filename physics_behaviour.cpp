@@ -64,20 +64,20 @@ int liquid::update(std::vector<std::vector<uint16_t>>& particles, std::vector<st
 		particles[x][y + 1] = type;
 		updated++;
 	}
-	else if (p[x - 1][y + 1] == EMPTY && std::rand() % 2 == 0)
-	{
-		auto tile = particles[x - 1][y + 1];
-		particles[x][y] = tile;
-		particles[x - 1][y + 1] = type;
-		updated++;
-	}
-	else if (p[x + 1][y + 1] == EMPTY && std::rand() % 2 == 1)
-	{
-		auto tile = particles[x + 1][y + 1];
-		particles[x][y] = tile;
-		particles[x + 1][y + 1] = type;
-		updated++;
-	}
+	//else if (p[x - 1][y + 1] == EMPTY && std::rand() % 2 == 0)
+	//{
+	//	auto tile = particles[x - 1][y + 1];
+	//	particles[x][y] = tile;
+	//	particles[x - 1][y + 1] = type;
+	//	updated++;
+	//}
+	//else if (p[x + 1][y + 1] == EMPTY && std::rand() % 2 == 1)
+	//{
+	//	auto tile = particles[x + 1][y + 1];
+	//	particles[x][y] = tile;
+	//	particles[x + 1][y + 1] = type;
+	//	updated++;
+	//}
 	else if (particles[x + 1][y] == EMPTY && std::rand() % 2 == 0 || particles[x][y - 1] == WATER && std::rand() % 2 == 0) {
 		/*int n = 1;
 		int max = 1;
@@ -156,20 +156,20 @@ int acid::update(std::vector<std::vector<uint16_t>>& particles, std::vector<std:
 		particles[x][y + 1] = EMPTY;
 		updated++;
 	}
-	else if (p[x - 1][y + 1] == EMPTY && std::rand() % 2 == 0)
-	{
-		auto tile = particles[x - 1][y + 1];
-		particles[x][y] = tile;
-		particles[x - 1][y + 1] = type;
-		updated++;
-	}
-	else if (p[x + 1][y + 1] == EMPTY && std::rand() % 2 == 1)
-	{
-		auto tile = particles[x + 1][y + 1];
-		particles[x][y] = tile;
-		particles[x + 1][y + 1] = type;
-		updated++;
-	}
+	//else if (p[x - 1][y + 1] == EMPTY && std::rand() % 2 == 0)
+	//{
+	//	auto tile = particles[x - 1][y + 1];
+	//	particles[x][y] = tile;
+	//	particles[x - 1][y + 1] = type;
+	//	updated++;
+	//}
+	//else if (p[x + 1][y + 1] == EMPTY && std::rand() % 2 == 1)
+	//{
+	//	auto tile = particles[x + 1][y + 1];
+	//	particles[x][y] = tile;
+	//	particles[x + 1][y + 1] = type;
+	//	updated++;
+	//}
 	else if (particles[x + 1][y] == EMPTY && std::rand() % 2 == 0 || particles[x][y - 1] == ACID && std::rand() % 2 == 0) {
 		acid::horizontalMovement(particles, x, y, 1, type);
 		updated++;

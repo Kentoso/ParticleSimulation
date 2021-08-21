@@ -1,9 +1,18 @@
-﻿  physics_behaviour.cpp
+﻿E:\Software\Visual Studio 2019\MSBuild\Microsoft\VC\v160\Microsoft.CppBuild.targets(513,5): warning MSB8028: The intermediate directory (x64\Release\) contains files shared from another project (SDL2First.vcxproj).  This can lead to incorrect clean and rebuild behavior.
+  event_handler.cpp
+  main.cpp
+E:\Projects\Visual Studio\SDL2First\SDL2First\main.cpp(106,38): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
+E:\Projects\Visual Studio\SDL2First\SDL2First\main.cpp(123,54): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
+E:\Projects\Visual Studio\SDL2First\SDL2First\main.cpp(128,57): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
+E:\Projects\Visual Studio\SDL2First\SDL2First\main.cpp(131,54): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
+E:\Projects\Visual Studio\SDL2First\SDL2First\main.cpp(134,55): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
+  map_helper.cpp
+  physics_behaviour.cpp
 E:\Projects\Visual Studio\SDL2First\SDL2First\physics_behaviour.cpp(48,15): warning C4267: '=': conversion from 'size_t' to 'int', possible loss of data
 E:\Projects\Visual Studio\SDL2First\SDL2First\physics_behaviour.cpp(133,15): warning C4267: '=': conversion from 'size_t' to 'int', possible loss of data
   Generating code
-  3 of 177 functions ( 1.7%) were compiled, the rest were copied from previous compilation.
-    0 functions were new in current compilation
-    0 functions had inline decision re-evaluated but remain unchanged
+  Previous IPDB not found, fall back to full compilation.
+E:\Projects\Visual Studio\SDL2First\SDL2First\event_handler.cpp(43): warning C4715: 'event_handler::chooseMaterial': not all control paths return a value
+  All 177 functions were compiled because no usable IPDB/IOBJ from previous compilation was found.
   Finished generating code
-  SDL2First.vcxproj -> E:\Projects\Visual Studio\SDL2First\x64\Release\SDL2First.exe
+  SDL2First.vcxproj -> E:\Projects\Visual Studio\SDL2First\x64\Release\ParticleSimulation.exe
